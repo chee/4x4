@@ -1,0 +1,151 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>4x4</title>
+<link rel="stylesheet" href="./html.css">
+<main class="machine">
+	<aside>
+		<pre class="screen" id="screen"></pre>
+	</aside>
+
+	<form class="controls">
+		<fieldset class="control-section top-row">
+			<label for="sound">
+				<input id="sound" type="button" class="button control">
+				sound
+			</label>
+
+
+			<label for="pattern">
+				<input id="pattern" type="button" class="button control">
+				pattern
+			</label>
+
+
+			<label for="bpm">
+				<input id="bpm" type="button" class="button control">
+				bpm
+			</label>
+
+
+			<label for="a">
+				<input id="a" type="range" class="encoder control">
+				a
+			</label>
+
+
+			<label for="b">
+				<input id="b" type="range" class="encoder control">
+				b
+			</label>
+		</fieldset>
+
+		<fieldset class="control-section sequencer">
+			<label for="1">
+				<audio id="audio-1" src="./sounds/1.flac" class="sample js-sample"></audio>
+				<input id="1" type="button" class="button control seq-button">
+				1
+			</label>
+
+			<label for="2">
+				<audio id="audio-1" src="./sounds/2.flac" class="sample js-sample"></audio>
+				<input id="2" type="button" class="button control seq-button">
+				2
+			</label>
+
+			<label for="3">
+				<input id="3" type="button" class="button control seq-button">
+				3
+			</label>
+
+			<label for="4">
+				<input id="4" type="button" class="button control seq-button">
+				4
+			</label>
+
+			<label for="5">
+				<input id="5" type="button" class="button control seq-button">
+				5
+			</label>
+
+			<label for="6">
+				<input id="6" type="button" class="button control seq-button">
+				6
+			</label>
+
+			<label for="7">
+				<input id="7" type="button" class="button control seq-button">
+				7
+			</label>
+
+			<label for="8">
+				<input id="8" type="button" class="button control seq-button">
+				8
+			</label>
+
+			<label for="9">
+				<input id="9" type="button" class="button control seq-button">
+				9
+			</label>
+
+			<label for="10">
+				<input id="10" type="button" class="button control seq-button">
+				10
+			</label>
+
+			<label for="11">
+				<input id="11" type="button" class="button control seq-button">
+				11
+			</label>
+
+			<label for="12">
+				<input id="12" type="button" class="button control seq-button">
+				12
+			</label>
+
+			<label for="13">
+				<input id="13" type="button" class="button control seq-button">
+				13
+			</label>
+
+			<label for="14">
+				<input id="14" type="button" class="button control seq-button">
+				14
+			</label>
+
+			<label for="15">
+				<input id="15" type="button" class="button control seq-button">
+				15
+			</label>
+
+			<label for="16">
+				<input id="16" type="button" class="button control seq-button">
+				16
+			</label>
+		</fieldset>
+
+		<fieldset class="control-section side-column">
+
+			<label for="record">
+				<input id="record" type="button" class="button control">
+				record
+			</label>
+
+			<label for="effects">
+				<input id="effects" type="button" class="button control">
+				effects
+			</label>
+
+			<label for="play">
+				<input id="play" type="button" class="button control">
+				play
+			</label>
+
+			<label for="write">
+				<input id="write" type="button" class="button control">
+				write
+			</label>
+		</fieldset>
+	</form>
+</main>
+
+<script src="./html.js"></script>
