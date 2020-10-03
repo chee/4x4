@@ -1,4 +1,3 @@
-let samples = document.querySelectorAll(".js-sample")
 let context = new AudioContext()
 
 function BufferLoader(context, urlList, callback) {
@@ -42,19 +41,20 @@ BufferLoader.prototype.load = function () {
 
 let loader = new BufferLoader(
 	context,
-	[].map.call(samples, n => n.src),
+	Array.from(Array(16), (_, index) => `./sounds/${index + 1}.flac`),
 	bufferloaded
 )
 loader.load()
 
-function createStore(handlers, state = state) {
+function createStore(handlers, state = {}) {
 	let subs = new Set()
 	return {
 		get: function () {
 			return state
 		},
-		send: function (event, data) {
+		send: function (event, data = null) {
 			let handler = handlers[event]
+			console.log(event, data)
 			let previousState = Object.assign({}, state)
 			if (handler) {
 				state = handler(state, data)
@@ -74,8 +74,14 @@ function createStore(handlers, state = state) {
 }
 
 let handlers = {
-	nextStep(state) {
+	nextScheduleStep(state) {
 		state.time += 60 / state.bpm / 4
+		if (++state.scheduleStep == 16) {
+			state.scheduleStep = 0
+		}
+		return state
+	},
+	nextStep(state) {
 		if (++state.step == 16) {
 			state.step = 0
 		}
@@ -83,24 +89,37 @@ let handlers = {
 	},
 	play(state) {
 		state.playing = !state.playing
+		if (state.playing) {
+			state.scheduleStep = 0
+			state.time = context.currentTime
+		}
 		return state
 	},
 	setSoundStep(state, step) {
 		let sound = state.sounds[state.sound]
 		let value
-		if (sound[step] && sound[step][0] == state.pitch) {
+		console.log(
+			sound[step],
+			state.pitch,
+			sound[step] && sound[step][0] === state.pitch
+		)
+		if (sound[step] && sound[step][0] === state.pitch) {
 			value = null
 		} else {
 			value = [state.pitch, state.velocity]
 		}
 
-		state.sounds[state.sound] = sound.map((current, index) =>
-			index == step ? value : current
-		)
+		state.sounds[state.sound] = Array.from(Array(16), (_, index) => {
+			return index == step ? value : state.sounds[state.sound][index]
+		})
 		return state
 	},
 	setPitch(state, value) {
 		state.pitch = value
+		return state
+	},
+	setSound(state, value) {
+		state.sound = value
 		return state
 	},
 	mode(state, value) {
@@ -109,10 +128,14 @@ let handlers = {
 	},
 }
 
+let makesoundsteparray = _ => Array.from(Array(16), _ => null)
+
 let store = createStore(handlers, {
 	step: 0,
+	scheduleStep: 0,
 	time: 0,
 	playing: false,
+	playingStep: 0,
 	mode: "normal",
 	pattern: 0,
 	sound: 0,
@@ -120,58 +143,7 @@ let store = createStore(handlers, {
 	velocity: 15,
 	bpm: 80,
 	// the pitch and velocity each sound is playing at a given step
-	sounds: [
-		[
-			[8, 15],
-			null,
-			null,
-			null,
-			[11, 15],
-			null,
-			null,
-			null,
-			[12, 15],
-			null,
-			null,
-			null,
-			[11, 15],
-			null,
-			null,
-			null,
-		],
-		[
-			null,
-			null,
-			[0, 15],
-			null,
-			[3, 15],
-			null,
-			[0, 15],
-			null,
-			[4, 15],
-			null,
-			[6, 15],
-			null,
-			[0, 15],
-			null,
-			[6, 15],
-			[7, 15],
-		],
-		[],
-		[],
-		[],
-		[],
-		[],
-		[],
-		[],
-		[],
-		[],
-		[],
-		[],
-		[],
-		[],
-		[],
-	],
+	sounds: Array.from(Array(16), makesoundsteparray),
 })
 
 let sources = Array(16)
@@ -235,11 +207,6 @@ let lookahead = 25
 let scheduleTime = 60 / store.get().bpm
 let queue = []
 
-function nextStep() {
-	let state = store.get()
-	store.send("nextStep")
-}
-
 function playSound(index, pitch, time) {
 	let sample = loader.bufferList[index]
 	if (sample) {
@@ -257,10 +224,10 @@ function playSound(index, pitch, time) {
 
 function scheduleStep() {
 	let state = store.get()
-	queue.push({step: state.step, time: state.time})
+	queue.push({step: state.scheduleStep, time: state.time})
 	state.sounds.forEach((sound, soundIndex) => {
-		if (sound[state.step]) {
-			let [pitch, velocity] = sound[state.step]
+		if (sound[state.scheduleStep]) {
+			let [pitch, velocity] = sound[state.scheduleStep]
 			playSound(soundIndex, pitch, state.time)
 		}
 	})
@@ -269,15 +236,17 @@ function scheduleStep() {
 function scheduler() {
 	let state = store.get()
 	while (state.time < context.currentTime + scheduleTime) {
-		scheduleStep(store)
-		nextStep(store)
+		scheduleStep()
+		store.send("nextScheduleStep")
 	}
 }
 
 let worker = new Worker("worker.js")
 worker.onmessage = function (event) {
 	if (event.data == "tick") {
-		scheduler(store)
+		scheduler()
+	} else if (event.data == "step") {
+		store.send("step")
 	} else {
 		console.log("WORKER", event.data)
 	}
@@ -296,8 +265,6 @@ store.sub(previous => {
 	}
 
 	if (state.playing) {
-		state.step = 0
-		state.time = context.currentTime
 		worker.postMessage("play")
 	} else {
 		worker.postMessage("pause")
@@ -305,6 +272,7 @@ store.sub(previous => {
 })
 
 let seqbuttons = document.querySelectorAll(".seq-button")
+let interval = null
 
 store.sub(previous => {
 	let state = store.get()
@@ -358,7 +326,10 @@ document.getElementById("write").addEventListener("click", () => {
 	store.send("mode", "write")
 })
 
-document.getElementById("sound").addEventListener("click", () => {})
+document.getElementById("sound").addEventListener("click", () => {
+	let state = store.get()
+	store.send("mode", "sound")
+})
 
 let output = document.getElementById("screen")
 function updateOutput() {
