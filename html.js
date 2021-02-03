@@ -90,6 +90,7 @@ let handlers = {
 	play(state) {
 		state.playing = !state.playing
 		if (state.playing) {
+			state.step = 0
 			state.scheduleStep = 0
 			state.time = context.currentTime
 		}
@@ -98,11 +99,6 @@ let handlers = {
 	setSoundStep(state, step) {
 		let sound = state.sounds[state.sound]
 		let value
-		console.log(
-			sound[step],
-			state.pitch,
-			sound[step] && sound[step][0] === state.pitch
-		)
 		if (sound[step] && sound[step][0] === state.pitch) {
 			value = null
 		} else {
@@ -246,13 +242,13 @@ worker.onmessage = function (event) {
 	if (event.data == "tick") {
 		scheduler()
 	} else if (event.data == "step") {
-		store.send("step")
+		store.send("nextStep")
 	} else {
 		console.log("WORKER", event.data)
 	}
 }
 
-worker.postMessage({interval: lookahead})
+worker.postMessage({tick: lookahead})
 
 document.getElementById("play").onclick = function () {
 	store.send("play")
@@ -266,6 +262,7 @@ store.sub(previous => {
 
 	if (state.playing) {
 		worker.postMessage("play")
+		worker.postMessage({step: (60 / state.bpm / 4) * 1000})
 	} else {
 		worker.postMessage("pause")
 	}
@@ -286,11 +283,11 @@ store.sub(previous => {
 
 store.sub(previous => {
 	let state = store.get()
-	if (
-		state.sound == previous.sound &&
-		state.sound[state.sound] == previous.sounds[state.sound]
-	) {
-		return
+	if (previous.step != state.step) {
+		let previousElement = document.querySelector(".seq-button--current")
+		previousElement && previousElement.classList.remove("seq-button--current")
+		let current = document.getElementById(`${state.step + 1}`)
+		current.classList.add("seq-button--current")
 	}
 })
 
@@ -331,6 +328,11 @@ document.getElementById("sound").addEventListener("click", () => {
 	store.send("mode", "sound")
 })
 
+document.getElementById("record").addEventListener("click", () => {
+	let state = store.get()
+	store.send("mode", "record")
+})
+
 let output = document.getElementById("screen")
 function updateOutput() {
 	let state = store.get()
@@ -339,6 +341,7 @@ playing: ${state.playing}
 sound: ${state.sound}
 pitch: ${state.pitch}
 bpm: ${state.bpm}
+step: ${state.step}
 `
 }
 store.sub(updateOutput)

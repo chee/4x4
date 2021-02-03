@@ -6,14 +6,14 @@ let step = 100000
 
 self.onmessage = function (event) {
 	if (event.data == "play") {
-		console.log("starting")
 		tickInterval = setInterval(() => {
-			self.postMessage("tick")
+			postMessage("tick")
 		}, tick)
+		stepInterval = setInterval(() => {
+			postMessage("step")
+		})
 	} else if (event.data.tick) {
-		console.log("setting tick")
 		tick = event.data.tick
-		console.log("tick = " + tick)
 		if (tickInterval) {
 			clearInterval(tickInterval)
 			tickInterval = setInterval(() => {
@@ -22,15 +22,18 @@ self.onmessage = function (event) {
 		}
 	} else if (event.data.step) {
 		step = event.data.step
-		clearInterval(stepInterval)
-		stepInterval = setInterval(() => {
-			postMessage("step")
-		}, step)
+		if (stepInterval) {
+			clearInterval(stepInterval)
+			stepInterval = setInterval(() => {
+				postMessage("step")
+			}, step)
+		}
 	} else if (event.data == "pause") {
-		console.log("stopping")
 		clearInterval(tickInterval)
 		clearInterval(stepInterval)
+		tickInterval = null
+		stepInterval = null
 	}
 }
 
-postMessage("hi there")
+postMessage("im ready 4 u")

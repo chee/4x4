@@ -1,0 +1,27 @@
+{
+	"compilerOptions": {
+		"esModuleInterop": true,
+		"target": "es5",
+		"lib": [
+			"dom",
+			"dom.iterable",
+			"es2020"
+		],
+		"strict": true,
+		"module": "esnext",
+		"types": [
+			"p5"
+		],
+		"jsx": "preserve",
+		"jsxFactory": "h"
+	},
+	"jsx": "preserve",
+	"jsxFactory": "h",
+	"include": [
+		"src/**/*",
+		"node_modules/@types/p5/global.d.ts",
+		"node_modules/@types/p5/index.d.ts",
+		"node_modules/@types/p5/lib/addons/p5.sound.d.ts",
+		"node_modules/@types/p5/lib/addons/p5.dom.d.ts"
+	]
+}

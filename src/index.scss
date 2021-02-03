@@ -58,10 +58,20 @@ label {
 }
 
 .control {
+	border: 2px solid black;
 	display: block;
 	height: 40px;
 	width: 40px;
 }
+
+.mode {
+	background: white;
+	&.mode--active {
+		background: orange;
+	}
+
+}
+
 
 .top-row {
 	grid-area: top;
@@ -95,10 +105,13 @@ label {
 	margin-left: 2px;
 }
 
-.seq-button--current {
-	border: 2px solid red;
-}
+.seq-button {
 
-.seq-button--active {
-	background: pink;
+	&.seq-button--current {
+		border: 2px solid red;
+	}
+
+	&.seq-button--scheduled {
+		background: pink;
+	}
 }

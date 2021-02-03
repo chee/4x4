@@ -1,0 +1,109 @@
+* {
+  box-sizing: border-box;
+  user-select: none;
+}
+
+html {
+  font-size: 2em;
+}
+
+.control-section {
+  padding: 0;
+  margin: 0;
+  border: 1px solid black;
+}
+
+.playing .control-section {
+  border: 1px solid #00cccc;
+}
+
+label {
+  font-size: 10px;
+  font-family: monospace;
+  display: block;
+  padding-left: 10px;
+}
+
+.screen {
+  color: white;
+  background: black;
+  font-family: monospace;
+  font-size: 0.8em;
+  width: 300px;
+  margin: auto;
+}
+
+::-moz-range-thumb {
+  background: #000000;
+  height: 20px;
+  width: 20px;
+  border-radius: 20px;
+  border: none;
+}
+
+::-moz-range-track {
+  background: #000000;
+}
+
+.controls {
+  display: grid;
+  grid-template-areas: "top top" "sequencer side";
+  grid-template-rows: 60px 240px;
+  grid-template-columns: 240px 60px;
+  align-items: center;
+  justify-content: center;
+}
+
+.control {
+  border: 2px solid black;
+  display: block;
+  height: 40px;
+  width: 40px;
+}
+
+.mode {
+  background: white;
+}
+.mode.mode--active {
+  background: orange;
+}
+
+.top-row {
+  grid-area: top;
+  display: grid;
+  grid-template-columns: 60px 60px 60px 60px 60px;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 0;
+  margin-bottom: 2px;
+  padding-right: 0.5px;
+}
+
+.sequencer {
+  grid-area: sequencer;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  grid-template-columns: 60px 60px 60px 60px;
+  grid-template-rows: 60px 60px 60px 60px;
+}
+
+.side-column {
+  grid-area: side;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  grid-template-rows: 60px 60px 60px 60px;
+  grid-template-columns: 60px;
+  width: 60px;
+  border-left: 0;
+  margin-left: 2px;
+}
+
+.seq-button.seq-button--current {
+  border: 2px solid red;
+}
+.seq-button.seq-button--scheduled {
+  background: pink;
+}
+/*# sourceMappingURL=index.083cb60f.css.map */
