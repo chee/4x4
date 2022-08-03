@@ -7,7 +7,7 @@
 		"start": "parcel serve ./src/index.html",
 		"build": "parcel build ./src/index.html -d website --public-url /pockets"
 	},
-	"author": "chee <chee@snoot.club>",
+	"author": "chee <yay@chee.party>",
 	"license": "CC0-1.0",
 	"dependencies": {
 		"@types/node": "^14.11.2",
